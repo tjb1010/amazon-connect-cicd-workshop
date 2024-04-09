@@ -4,24 +4,24 @@
         "env": "dev",
         "branch": "develop",
         "enabled": true,
-        "account": "XXXXXXXXXXXX",
-        "region": ["us-east-1", "us-west-2"],
-        "app": "ACME"
+        "account": "310840789276",
+        "region": ["us-west-2"],
+        "app": "sebt"
     },
     {
         "env": "staging",
         "branch": "staging",
         "enabled": true,
-        "account": "XXXXXXXXXXXX",
-        "region": ["us-east-1", "us-west-2"],
-        "app": "ACME"
+        "account": "900012539052",
+        "region": ["us-west-2"], 
+        "app": "sebt"
     },
     {
         "env": "prod",
         "branch": "main",
         "enabled": true,
-        "account": "XXXXXXXXXXXZ",
-        "region": ["us-east-1", "us-west-2"],
-        "app": "ACME"
+        "account": "074664187670",
+        "region": ["us-west-2"],
+        "app": "sebt"
     }]
 }
