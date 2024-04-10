@@ -450,7 +450,8 @@ export class PipelineStack extends Stack {
           phases: {
             build: {
               commands: [
-                "pwd",
+                "sudo apt install tree",
+                "tree -d",
                 "cd amzconnect-lambdas",
                 "npm install -g aws-cdk@latest",
                 // 'npm install cdk-assets',
