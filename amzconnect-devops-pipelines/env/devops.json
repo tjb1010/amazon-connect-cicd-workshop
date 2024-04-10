@@ -2,9 +2,8 @@
     "env": "devops",
     "account": "310840789276",
     "region": "us-west-2",
-    "codestarArn": "arn:aws:codestar-connections:us-west-2:310840789276:connection/fa355e52-6e80-4281-bfee-39175141f29c",
-    "repo": "amazon-connect-cicd-workshop",
-    "owner": "tjb1010",
+    "repo": "arn:aws:codecommit:us-west-2:310840789276:or-sebt-2024",
+    "owner": "ORPEBT-PINPOINT-FULLACCESS/tbickford@deloitte.com",
     "email": "tbickford@deloitte.com"
 }
 

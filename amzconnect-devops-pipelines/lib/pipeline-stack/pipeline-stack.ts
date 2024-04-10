@@ -14,6 +14,7 @@ import { Construct } from "constructs";
 import { aws_codebuild as codebuild } from "aws-cdk-lib";
 import { aws_codepipeline as codepipeline } from "aws-cdk-lib";
 import { aws_codepipeline_actions as codepipeline_actions } from "aws-cdk-lib";
+import { aws_codecommit as codecommit } from "aws-cdk-lib";
 import { aws_kms as kms } from "aws-cdk-lib";
 import { aws_iam as iam } from "aws-cdk-lib";
 import { aws_secretsmanager as secretsmanager, SecretValue } from "aws-cdk-lib";
@@ -45,7 +46,6 @@ export type Devopsproperties = {
     env:         string;
     account:     string;
     region:      string;
-    codestarArn: string;
     repo:        string;
     owner:       string;
     email:       string;
@@ -591,8 +591,11 @@ export class PipelineStack extends Stack {
     const cdkSynthOutput = new codepipeline.Artifact("cdkSynthOutput");
 
     //* Get repo values from devopsProperties
-    const codestarArn = devopsProperties.codestarArn;
-    const repo = devopsProperties.repo;
+    const repo = codecommit.Repository.fromRepositoryArn(
+      this, 
+      "CodeCommitRepo",
+      devopsProperties.repo
+    );
     const owner = devopsProperties.owner;
 
     //* Give pipeline deployment roles access to KMS key
@@ -622,23 +625,40 @@ export class PipelineStack extends Stack {
           // reuseCrossRegionSupportStacks: true
         }
       );
+      
 
-      instancePipeline.addStage({
-        stageName: "Source",
-        actions: [
-          new codepipeline_actions.CodeStarConnectionsSourceAction({
-            actionName: "Github_Source",
-            repo: repo,
-            owner: owner,
-            branch: `${acct.branch}`,
-            output: sourceOutput,
-            role: pipelineRole,
-            connectionArn: codestarArn,
-            triggerOnPush: false,
-            variablesNamespace: "SourceVariables",
-          }),
-        ],
-      });
+    // add codecommit source stage
+    instancePipeline.addStage({
+      stageName: "Source",
+      actions: [
+        new codepipeline_actions.CodeCommitSourceAction({
+          actionName: "CodeCommit_Source",
+          repository: repo,
+          branch: `${acct.branch}`,
+          output: sourceOutput,
+          role: pipelineRole,
+          variablesNamespace: "SourceVariables"
+        }),
+      ],
+    });
+
+
+      // instancePipeline.addStage({
+      //   stageName: "Source",
+      //   actions: [
+      //     new codepipeline_actions.CodeStarConnectionsSourceAction({
+      //       actionName: "Github_Source",
+      //       repo: repo,
+      //       owner: owner,
+      //       branch: `${acct.branch}`,
+      //       output: sourceOutput,
+      //       role: pipelineRole,
+      //       connectionArn: codestarArn,
+      //       triggerOnPush: false,
+      //       variablesNamespace: "SourceVariables",
+      //     }),
+      //   ],
+      // });
 
       instancePipeline.addStage({
         stageName: "Synth",
@@ -739,23 +759,36 @@ export class PipelineStack extends Stack {
           // $crossAccountKeys: true,
         }
       );
-
+      
       infraPipeline.addStage({
         stageName: "Source",
         actions: [
-          new codepipeline_actions.CodeStarConnectionsSourceAction({
-            actionName: "Github_Source",
-            repo: repo,
-            owner: owner,
+          new codepipeline_actions.CodeCommitSourceAction({
+            actionName: "CodeCommit_Source",
+            repository: repo,
             branch: `${acct.branch}`,
             output: sourceOutput,
             role: pipelineRole,
-            connectionArn: codestarArn,
-            triggerOnPush: false,
-            variablesNamespace: "SourceVariables",
+            variablesNamespace: "SourceVariables"
           }),
         ],
       });
+
+      // infraPipeline.addStage({
+      //   stageName: "Source",
+      //   actions: [
+      //     new codepipeline_actions.CodeStarConnectionsSourceAction({
+      //       actionName: "Github_Source",
+      //       repo: repo,
+      //       owner: owner,
+      //       branch: `${acct.branch}`,
+      //       output: sourceOutput,
+      //       role: pipelineRole,
+      //       triggerOnPush: false,
+      //       variablesNamespace: "SourceVariables",
+      //     }),
+      //   ],
+      // });
 
       infraPipeline.addStage({
         stageName: "Synth",
@@ -839,23 +872,36 @@ export class PipelineStack extends Stack {
           // $crossAccountKeys: true,
         }
       );
-
       lambdaPipeline.addStage({
         stageName: "Source",
         actions: [
-          new codepipeline_actions.CodeStarConnectionsSourceAction({
-            actionName: "Github_Source",
-            repo: repo,
-            owner: owner,
+          new codepipeline_actions.CodeCommitSourceAction({
+            actionName: "CodeCommit_Source",
+            repository: repo,
             branch: `${acct.branch}`,
             output: sourceOutput,
             role: pipelineRole,
-            connectionArn: codestarArn,
-            triggerOnPush: false,
             variablesNamespace: "SourceVariables",
           }),
         ],
       });
+
+      // lambdaPipeline.addStage({
+      //   stageName: "Source",
+      //   actions: [
+      //     new codepipeline_actions.CodeStarConnectionsSourceAction({
+      //       actionName: "Github_Source",
+      //       repo: repo,
+      //       owner: owner,
+      //       branch: `${acct.branch}`,
+      //       output: sourceOutput,
+      //       role: pipelineRole,
+      //       connectionArn: codestarArn,
+      //       triggerOnPush: false,
+      //       variablesNamespace: "SourceVariables",
+      //     }),
+      //   ],
+      // });
 
       lambdaPipeline.addStage({
         stageName: "Synth",
@@ -979,23 +1025,37 @@ export class PipelineStack extends Stack {
           // $crossAccountKeys: true,
         }
       );
-
+      
       contactFlowPipeline.addStage({
         stageName: "Source",
         actions: [
-          new codepipeline_actions.CodeStarConnectionsSourceAction({
-            actionName: "Github_Source",
-            repo: repo,
-            owner: owner,
+          new codepipeline_actions.CodeCommitSourceAction({
+            actionName: "CodeCommit_Source",
+            repository: repo,
             branch: `${acct.branch}`,
             output: sourceOutput,
             role: pipelineRole,
-            connectionArn: codestarArn,
-            triggerOnPush: false,
-            variablesNamespace: "SourceVariables",
+            variablesNamespace: "SourceVariables"
           }),
         ],
       });
+      
+      // contactFlowPipeline.addStage({
+      //   stageName: "Source",
+      //   actions: [
+      //     new codepipeline_actions.CodeStarConnectionsSourceAction({
+      //       actionName: "Github_Source",
+      //       repo: repo,
+      //       owner: owner,
+      //       branch: `${acct.branch}`,
+      //       output: sourceOutput,
+      //       role: pipelineRole,
+      //       connectionArn: codestarArn,
+      //       triggerOnPush: false,
+      //       variablesNamespace: "SourceVariables",
+      //     }),
+      //   ],
+      // });
 
       if (acct.env == "prod") {
         contactFlowPipeline.addStage({
