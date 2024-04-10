@@ -450,6 +450,7 @@ export class PipelineStack extends Stack {
           phases: {
             build: {
               commands: [
+                "pwd",
                 "cd amzconnect-lambdas",
                 "npm install -g aws-cdk@latest",
                 // 'npm install cdk-assets',
@@ -554,6 +555,7 @@ export class PipelineStack extends Stack {
             build: {
               commands: [
                 "npm install -g aws-cdk@latest",
+                "pwd",
                 "cd amzconnect-lambdas",
                 "npm ci",
                 "npm run build",
